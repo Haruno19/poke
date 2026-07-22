@@ -179,7 +179,6 @@ src/
   timer.rs       // Timer struct + pure firing/parsing logic + tests
   storage.rs     // load/save timers, atomic write
   notify.rs      // fire() with graceful fallback to the bell
-  digits.rs      // block-character glyphs for the clock
   ui/
     mod.rs       // top-level layout, dispatches to the three below
     header.rs    // logo + clock + active count
