@@ -4,7 +4,8 @@ use ratatui::text::Line;
 use ratatui::widgets::Paragraph;
 use ratatui::Frame;
 
-use crate::timer::Timer;
+use crate::app::App;
+use crate::timer::{Timer, TimerRuntime};
 use super::{centered_area, panel};
 
 const LOGO_HEIGHT: u16 = 5;
@@ -12,9 +13,8 @@ const LOGO_WIDTH: u16 = 18;
 const CLOCK_HEIGHT: u16 = 3;
 const RECAP_HEIGHT: u16 = 3;
 
-pub(super) fn draw_header(frame: &mut Frame, area: Rect) {
-    let now: DateTime<Local> = Local::now();
-
+pub(super) fn draw(frame: &mut Frame, area: Rect, app: &App, now: DateTime<Local>) 
+{
     let header_block = panel(" poke ");
     let inner = header_block.inner(area);
     frame.render_widget(header_block, area);
@@ -26,11 +26,13 @@ pub(super) fn draw_header(frame: &mut Frame, area: Rect) {
     let recap_area = centered_area(RECAP_HEIGHT, recap).inner(Margin::new(1, 0));
     frame.render_widget(draw_logo(now), logo_area);
     frame.render_widget(draw_clock(now), clock_area);
-    frame.render_widget(draw_recap(&[]), recap_area);
+    frame.render_widget(draw_recap(&app.timers), recap_area);
 }
 
-fn draw_logo(now: DateTime<Local>) -> Paragraph<'static> {
-    let art = match now.hour() {
+fn draw_logo(now: DateTime<Local>) -> Paragraph<'static> 
+{
+    let art = match now.hour() 
+    {
         5..=11 => SUNRISE,
         12..=17 => DAY,
         18..=21 => SUNSET,
@@ -39,7 +41,8 @@ fn draw_logo(now: DateTime<Local>) -> Paragraph<'static> {
     return Paragraph::new(art);
 }
 
-fn draw_clock(now: DateTime<Local>) -> Paragraph<'static> {
+fn draw_clock(now: DateTime<Local>) -> Paragraph<'static> 
+{
     // let (h, m) = (now.hour() as usize, now.minute() as usize);
     // let glyphs = [
     //     &DIGITS[h / 10], &DIGITS[h % 10],
@@ -60,8 +63,9 @@ fn draw_clock(now: DateTime<Local>) -> Paragraph<'static> {
     ])
 }
 
-fn draw_recap(timers: &[Timer]) -> Paragraph<'static> {
-    let active = timers.iter().filter(|t| t.enabled).count();
+fn draw_recap(timers: &[(Timer, TimerRuntime)]) -> Paragraph<'static> 
+{
+    let active = timers.iter().filter(|(t, _)| t.enabled).count();
     let inactive = timers.len() - active;
 
     Paragraph::new(vec![
@@ -73,7 +77,8 @@ fn draw_recap(timers: &[Timer]) -> Paragraph<'static> {
 
 //——— Helpers —————————————————————————————————/
 
-fn plural(n: usize) -> &'static str {
+fn plural(n: usize) -> &'static str 
+{
     if n == 1 { "" } else { "s" }
 }
 
