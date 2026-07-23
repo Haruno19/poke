@@ -1,16 +1,22 @@
 mod header;
 mod list;
+mod form;
 
 use chrono::{DateTime, Local};
 use ratatui::layout::{Constraint, Flex, Layout, Rect};
+use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, BorderType, Paragraph};
 use ratatui::Frame;
 
-use crate::app::App;
+use crate::app::{App};
+
+//——— Dimensions —————————————————————————————————/
 
 const MIN_WIDTH: u16 = 80;
-const MIN_HEIGHT: u16 = 20;
+const MIN_HEIGHT: u16 = 21;
 const HEADER_HEIGHT: u16 = 9;
+
+//——— Render —————————————————————————————————————/
 
 pub fn draw(frame: &mut Frame, app: &mut App) 
 {
@@ -36,15 +42,21 @@ pub fn draw(frame: &mut Frame, app: &mut App)
 
     header::draw(frame, header, app, now);
     list::draw(frame, list, app);
-    frame.render_widget(panel(" new "), form);
+    form::draw(frame, form, app);
 }
 
 //——— Helpers —————————————————————————————————/
 
-fn panel(title: &str) -> Block<'_> 
-{
+fn panel(title: &str, focused: bool) -> Block<'_> {
+    let title_style = if focused {
+        Style::new().bold().italic().fg(Color::Yellow)
+    } else {
+        Style::default()
+    };
+
     Block::bordered()
         .title(title)
+        .title_style(title_style)
         .border_type(BorderType::Rounded)
 }
 

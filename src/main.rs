@@ -5,7 +5,7 @@ mod action;
 
 use std::io;
 use std::time::Duration;
-use ratatui::crossterm::event::{self, Event, KeyCode, KeyEventKind};
+use ratatui::crossterm::event::{self, Event, KeyEventKind};
 use ratatui::DefaultTerminal;
 
 use crate::app::App;
@@ -19,7 +19,7 @@ fn run_app(terminal: &mut DefaultTerminal) -> io::Result<()>
 {
     let mut app = App::mock();
 
-    loop 
+    while !app.should_quit
     {
         terminal.draw(|frame| ui::draw(frame, &mut app))?;
 
@@ -27,16 +27,17 @@ fn run_app(terminal: &mut DefaultTerminal) -> io::Result<()>
         // loop continue. This is what keeps the clock ticking later on.
         if event::poll(Duration::from_millis(250))? 
         {
-            if let Event::Key(key) = event::read()? 
+            if let Event::Key(key) = event::read()? && key.kind == KeyEventKind::Press
             {
-                if key.kind == KeyEventKind::Press
-                    && matches!(key.code, KeyCode::Char('q') | KeyCode::Esc)
+                if let Some(action) = action::map_key(key, app.current_focus)
                 {
-                    return Ok(());
+                    app.update(action);
                 }
+                
             }
         }
     }
+    return Ok(());
 }
 
 

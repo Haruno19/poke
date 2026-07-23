@@ -1,5 +1,6 @@
 use chrono::{DateTime, Local, Timelike};
 use ratatui::layout::{Constraint, Layout, Margin, Rect};
+use ratatui::style::{Color, Style};
 use ratatui::text::Line;
 use ratatui::widgets::Paragraph;
 use ratatui::Frame;
@@ -8,14 +9,18 @@ use crate::app::App;
 use crate::timer::{Timer, TimerRuntime};
 use super::{centered_area, panel};
 
+//——— Dimensions —————————————————————————————————/
+
 const LOGO_HEIGHT: u16 = 5;
 const LOGO_WIDTH: u16 = 18;
 const CLOCK_HEIGHT: u16 = 3;
 const RECAP_HEIGHT: u16 = 3;
 
+//——— Render ————————————————————————————————————/
+
 pub(super) fn draw(frame: &mut Frame, area: Rect, app: &App, now: DateTime<Local>) 
 {
-    let header_block = panel(" poke ");
+    let header_block = panel(" poke ", false).title_style(Style::new().bold());
     let inner = header_block.inner(area);
     frame.render_widget(header_block, area);
 
@@ -38,7 +43,7 @@ fn draw_logo(now: DateTime<Local>) -> Paragraph<'static>
         18..=21 => SUNSET,
         _ => NIGHT,
     };
-    return Paragraph::new(art);
+    return Paragraph::new(art).style(Style::new().fg(Color::Yellow));
 }
 
 fn draw_clock(now: DateTime<Local>) -> Paragraph<'static> 
@@ -57,9 +62,9 @@ fn draw_clock(now: DateTime<Local>) -> Paragraph<'static>
     // return Paragraph::new(lines);
 
     return Paragraph::new(vec![
-        Line::from(now.format("%H:%M").to_string()),
+        Line::from(now.format("%H:%M").to_string()).style(Style::new().bold()),
         Line::from(""),
-        Line::from(now.format("%A, %B %-d, %Y").to_string()),
+        Line::from(now.format("%A, %B %-d, %Y").to_string()).style(Style::new().italic()),
     ])
 }
 
