@@ -1,14 +1,9 @@
-use std::{fs, path::{Path, PathBuf}};
+use std::fs;
 
 use ratatui::style::Color;
 use serde::Deserialize;
-use etcetera::{choose_base_strategy, BaseStrategy};
 
-//——— Paths ————————————————————————————————————/
-
-const POKE_DIR: &str = "poke";
-const CONFIG_FILE: &str = "config.toml";
-const TIMERS_FILE: &str = "timers.toml";
+use crate::paths::config_path;
 
 //——— Structs ——————————————————————————————————/
 
@@ -55,24 +50,4 @@ impl Config
             }
         }
     }
-}
-
-//——— Helpers ————————————————————————————————————/
-
-fn config_path() -> Option<PathBuf> {
-    let mut path= poke_dir()?;
-    path.push(CONFIG_FILE);
-    Some(path)
-}
-
-fn timers_path() -> Option<PathBuf> {
-    let mut path= poke_dir()?;
-    path.push(TIMERS_FILE);
-    Some(path)
-}
-
-pub fn poke_dir() -> Option<PathBuf> {
-    let mut path = choose_base_strategy().ok()?.config_dir();
-    path.push(POKE_DIR);
-    Some(path)
 }

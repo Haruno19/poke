@@ -1,12 +1,12 @@
 use chrono::{DateTime, Local, Timelike};
 use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::style::{Color, Style};
-use ratatui::text::Line;
+use ratatui::text::{Line, Span};
 use ratatui::widgets::Paragraph;
 use ratatui::Frame;
 
 use crate::app::App;
-use crate::timer::{Timer, TimerRuntime};
+use crate::timer::{Timer};
 use super::{centered_area, panel};
 
 //——— Dimensions —————————————————————————————————/
@@ -31,7 +31,7 @@ pub(super) fn draw(frame: &mut Frame, area: Rect, app: &App, now: DateTime<Local
     let recap_area = centered_area(RECAP_HEIGHT, recap);
     frame.render_widget(draw_logo(now, app.config.accent), logo_area);
     frame.render_widget(draw_clock(now, &app.config.time_format, &app.config.date_format), clock_area);
-    frame.render_widget(draw_recap(&app.timers), recap_area);
+    frame.render_widget(draw_recap(&app.timers, app.config.accent), recap_area);
 }
 
 fn draw_logo(now: DateTime<Local>, color: Color) -> Paragraph<'static> 
@@ -48,19 +48,6 @@ fn draw_logo(now: DateTime<Local>, color: Color) -> Paragraph<'static>
 
 fn draw_clock(now: DateTime<Local>, time_format: &String, date_format: &String) -> Paragraph<'static> 
 {
-    // let (h, m) = (now.hour() as usize, now.minute() as usize);
-    // let glyphs = [
-    //     &DIGITS[h / 10], &DIGITS[h % 10],
-    //     &COLON,
-    //     &DIGITS[m / 10], &DIGITS[m % 10],
-    // ];
-
-    // let lines: Vec<Line> = (0..5)
-    //     .map(|row| Line::from(glyphs.map(|g| g[row]).join(" ")))
-    //     .collect();
-
-    // return Paragraph::new(lines);
-
     return Paragraph::new(vec![
         Line::from(now.format(time_format).to_string()).style(Style::new().bold()),
         Line::from(""),
@@ -68,15 +55,21 @@ fn draw_clock(now: DateTime<Local>, time_format: &String, date_format: &String) 
     ])
 }
 
-fn draw_recap(timers: &[(Timer, TimerRuntime)]) -> Paragraph<'static> 
+fn draw_recap(timers: &[Timer], accent: Color) -> Paragraph<'static> 
 {
-    let active = timers.iter().filter(|(t, _)| t.enabled).count();
+    let active = timers.iter().filter(|t| t.enabled).count();
     let inactive = timers.len() - active;
 
     Paragraph::new(vec![
-        Line::from(format!("{active} active timer{}", plural(active))),
+        Line::from(vec![
+            Span::styled(format!("{active}"), Style::new().bold().fg(accent)),
+            Span::from(format!(" active timer{}", plural(active)))
+        ]),
         Line::from(""),
-        Line::from(format!("{inactive} inactive timer{}", plural(inactive))),
+        Line::from(vec![
+            Span::styled(format!("{inactive}"), Style::new().bold().fg(accent)),
+            Span::from(format!(" inactive timer{}", plural(inactive)))
+        ]),
     ])
 }
 
@@ -112,18 +105,3 @@ const SUNSET: &str = r#"       |
   ─ ███████ ─  
   ▁▁▁▀█▀▁▁▁▁▁  
       ░▒░      "#;
-
-// const DIGITS: [[&str; 5]; 10] = [
-//     ["┏━━┓", "┃  ┃", "┃  ┃", "┃  ┃", "┗━━┛"], // 0
-//     ["   ╻", "   ┃", "   ┃", "   ┃", "   ╹"], // 1
-//     ["┏━━┓", "   ┃", "┏━━┛", "┃   ", "┗━━╸"], // 2
-//     ["┏━━┓", "   ┃", "╺━━┫", "   ┃", "╺━━┛"], // 3
-//     ["╻  ╻", "┃  ┃", "┗━━┫", "   ┃", "   ╹"], // 4
-//     ["┏━━╸", "┃   ", "┗━━┓", "   ┃", "╺━━┛"], // 5
-//     ["┏━━╸", "┃   ", "┣━━┓", "┃  ┃", "┗━━┛"], // 6
-//     ["┏━━┓", "   ┃", "   ┃", "   ┃", "   ╹"], // 7
-//     ["┏━━┓", "┃  ┃", "┣━━┫", "┃  ┃", "┗━━┛"], // 8
-//     ["┏━━┓", "┃  ┃", "┗━━┫", "   ┃", "╺━━┛"], // 9
-// ];
-
-// const COLON: [&str; 5] = [" ", "●", " ", "●", " "];

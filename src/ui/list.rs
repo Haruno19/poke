@@ -5,7 +5,7 @@ use ratatui::widgets::{Row, Table, TableState};
 
 use crate::app::{App, Focus};
 use crate::config::Config;
-use crate::timer::{Timer, TimerRuntime};
+use crate::timer::{Timer};
 use super::{panel};
 
 pub(super) fn draw(frame: &mut Frame, area: Rect, app: &mut App) 
@@ -18,11 +18,11 @@ pub(super) fn draw(frame: &mut Frame, area: Rect, app: &mut App)
 }   
 
 
-fn draw_list(frame: &mut Frame, area: Rect, timers: &[(Timer, TimerRuntime)], table_state: &mut TableState, config: &Config) 
+fn draw_list(frame: &mut Frame, area: Rect, timers: &[Timer], table_state: &mut TableState, config: &Config) 
 {
     let rows: Vec<Row> = timers
         .iter()
-        .map(|(timer, _runtime)| build_row(timer))
+        .map(|timer| build_row(timer))
         .collect();
 
     let widths = [

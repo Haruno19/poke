@@ -1,10 +1,10 @@
 use std::time::Duration;
 
 use crate::config::Config;
-use crate::timer::{Timer, TimerRuntime, parse_interval};
+use crate::timer::{Timer, parse_interval};
 use crate::action::Action; 
 
-use chrono::{Local, NaiveTime};
+use chrono::{NaiveTime};
 use ratatui::widgets::TableState;
 
 //——— Field Dimentions ——————————————————————————/
@@ -153,7 +153,7 @@ impl FormState
 
 pub struct App 
 {
-    pub timers:Vec<(Timer, TimerRuntime)>,
+    pub timers:Vec<Timer>,
     pub table_state: TableState,
     pub current_focus: Focus,
     pub form_state: FormState,
@@ -178,20 +178,16 @@ impl App
 
     pub fn mock() -> Self 
     {
-        let now = Local::now();
         let mk = |name: &str, mins: u64, s: (u32, u32), e: (u32, u32), on: bool| 
         {
-            (
-                Timer 
-                {
-                    name: name.to_string(),
-                    interval: Duration::from_secs(mins * 60),
-                    start: NaiveTime::from_hms_opt(s.0, s.1, 0).unwrap(),
-                    end: NaiveTime::from_hms_opt(e.0, e.1, 0).unwrap(),
-                    enabled: on,
-                },
-                TimerRuntime { last_checked: now },
-            )
+            Timer 
+            {
+                name: name.to_string(),
+                interval: Duration::from_secs(mins * 60),
+                start: NaiveTime::from_hms_opt(s.0, s.1, 0).unwrap(),
+                end: NaiveTime::from_hms_opt(e.0, e.1, 0).unwrap(),
+                enabled: on,
+            }
         };
 
         Self 
@@ -239,7 +235,7 @@ impl App
             Action::ToggleTimer =>
             {
                 let Some(i) = self.table_state.selected() else { return };
-                if let Some((timer, _)) = self.timers.get_mut(i) 
+                if let Some(timer) = self.timers.get_mut(i) 
                 {
                     timer.enabled = !timer.enabled;
                 }
@@ -279,7 +275,7 @@ impl App
                 {
                     Ok(timer) => 
                     {
-                        self.timers.insert(0, (timer, TimerRuntime { last_checked: Local::now() }));
+                        self.timers.insert(0, timer);
                         self.form_state = FormState::new();
                         self.current_focus = Focus::List;
                         self.table_state.select_first();
