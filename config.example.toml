@@ -1,0 +1,8 @@
+# ~/.config/poke/config.toml
+
+time_format = "%H:%M"
+date_format = "%A, %B %-d %Y"
+
+accent = "yellow"
+selected_bg = "light-yellow"
+selected_text = "black"

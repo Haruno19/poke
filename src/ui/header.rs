@@ -1,5 +1,5 @@
 use chrono::{DateTime, Local, Timelike};
-use ratatui::layout::{Constraint, Layout, Margin, Rect};
+use ratatui::layout::{Constraint, Layout, Rect};
 use ratatui::style::{Color, Style};
 use ratatui::text::Line;
 use ratatui::widgets::Paragraph;
@@ -20,21 +20,21 @@ const RECAP_HEIGHT: u16 = 3;
 
 pub(super) fn draw(frame: &mut Frame, area: Rect, app: &App, now: DateTime<Local>) 
 {
-    let header_block = panel(" poke ", false).title_style(Style::new().bold());
+    let header_block = panel(" poke ", false, app.config.accent).title_style(Style::new().bold());
     let inner = header_block.inner(area);
     frame.render_widget(header_block, area);
 
     let [logo, clock, recap] =
         Layout::horizontal([Constraint::Length(LOGO_WIDTH), Constraint::Fill(2), Constraint::Fill(1)]).areas(inner);
-    let logo_area = centered_area(LOGO_HEIGHT, logo); 
+    let logo_area = centered_area(LOGO_HEIGHT, logo);
     let clock_area = centered_area(CLOCK_HEIGHT, clock);
-    let recap_area = centered_area(RECAP_HEIGHT, recap).inner(Margin::new(1, 0));
-    frame.render_widget(draw_logo(now), logo_area);
-    frame.render_widget(draw_clock(now), clock_area);
+    let recap_area = centered_area(RECAP_HEIGHT, recap);
+    frame.render_widget(draw_logo(now, app.config.accent), logo_area);
+    frame.render_widget(draw_clock(now, &app.config.time_format, &app.config.date_format), clock_area);
     frame.render_widget(draw_recap(&app.timers), recap_area);
 }
 
-fn draw_logo(now: DateTime<Local>) -> Paragraph<'static> 
+fn draw_logo(now: DateTime<Local>, color: Color) -> Paragraph<'static> 
 {
     let art = match now.hour() 
     {
@@ -43,10 +43,10 @@ fn draw_logo(now: DateTime<Local>) -> Paragraph<'static>
         18..=21 => SUNSET,
         _ => NIGHT,
     };
-    return Paragraph::new(art).style(Style::new().fg(Color::Yellow));
+    return Paragraph::new(art).style(Style::new().fg(color));
 }
 
-fn draw_clock(now: DateTime<Local>) -> Paragraph<'static> 
+fn draw_clock(now: DateTime<Local>, time_format: &String, date_format: &String) -> Paragraph<'static> 
 {
     // let (h, m) = (now.hour() as usize, now.minute() as usize);
     // let glyphs = [
@@ -62,9 +62,9 @@ fn draw_clock(now: DateTime<Local>) -> Paragraph<'static>
     // return Paragraph::new(lines);
 
     return Paragraph::new(vec![
-        Line::from(now.format("%H:%M").to_string()).style(Style::new().bold()),
+        Line::from(now.format(time_format).to_string()).style(Style::new().bold()),
         Line::from(""),
-        Line::from(now.format("%A, %B %-d, %Y").to_string()).style(Style::new().italic()),
+        Line::from(now.format(date_format).to_string()).style(Style::new().italic()),
     ])
 }
 

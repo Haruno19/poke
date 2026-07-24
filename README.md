@@ -187,17 +187,8 @@ Other notes:
 | `chrono`       | added   | Date/time types, strftime-style formatting from config.    |
 | `serde`        | pending | Derive for the persisted structs.                          |
 | `toml`         | pending | Config and timer serialization.                            |
-| `humantime`    | pending | Parses `"30m"`, `"1h"`, `"2h30m"` into a `Duration`.       |
 | `notify-rust`  | pending | Desktop notifications.                                     |
-| `anyhow`       | pending | Error handling (`Result` + `?` + `.context(...)`).         |
 | `etcetera`     | pending | XDG config paths on all platforms.                         |
-
-Notes:
-
-- **Do not add `crossterm` as a separate dependency.** `ratatui` re-exports it as `ratatui::crossterm`. Adding it separately risks two incompatible crossterm versions in the graph, producing confusing errors where `KeyCode` is not `KeyCode`.
-- **Do not use tokio.** A single-threaded poll loop covers everything here.
-- **No panic hook needed.** `ratatui::run()` (added in 0.30) handles terminal init, restore, *and* panic hooks. Older tutorials showing manual `enable_raw_mode()` / `EnterAlternateScreen` are out of date.
-- **macOS notification caveat.** `notify-rust` on macOS goes through `mac-notification-sys`, which wants an application bundle identifier. A bare `cargo run` binary is not a bundle, so notifications may silently do nothing until `set_application()` is called with a valid bundle id. Implement the terminal-bell fallback first so this is never blocking.
 
 ---
 

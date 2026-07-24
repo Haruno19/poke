@@ -3,7 +3,7 @@ mod list;
 mod form;
 
 use chrono::{DateTime, Local};
-use ratatui::layout::{Constraint, Flex, Layout, Rect};
+use ratatui::layout::{Constraint, Flex, Layout, Margin, Rect};
 use ratatui::style::{Color, Style};
 use ratatui::widgets::{Block, BorderType, Paragraph};
 use ratatui::Frame;
@@ -47,9 +47,9 @@ pub fn draw(frame: &mut Frame, app: &mut App)
 
 //——— Helpers —————————————————————————————————/
 
-fn panel(title: &str, focused: bool) -> Block<'_> {
+fn panel(title: &str, focused: bool, focused_color: Color) -> Block<'_> {
     let title_style = if focused {
-        Style::new().bold().italic().fg(Color::Yellow)
+        Style::new().bold().italic().fg(focused_color)
     } else {
         Style::default()
     };
@@ -64,6 +64,6 @@ fn centered_area(len: u16, area: Rect) -> Rect
 {
     let [centered] = Layout::vertical([Constraint::Length(len)])
         .flex(Flex::Center)
-        .areas(area);
+        .areas(area.inner(Margin::new(1, 0)));
     return centered;
 }

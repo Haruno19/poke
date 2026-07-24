@@ -2,6 +2,7 @@ mod timer;
 mod ui;
 mod app;
 mod action;
+mod config;
 
 use std::io;
 use std::time::Duration;

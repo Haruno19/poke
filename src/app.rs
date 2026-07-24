@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use crate::config::Config;
 use crate::timer::{Timer, TimerRuntime, parse_interval};
 use crate::action::Action; 
 
@@ -157,6 +158,7 @@ pub struct App
     pub current_focus: Focus,
     pub form_state: FormState,
     pub should_quit: bool,
+    pub config: Config,
 }
 
 impl App 
@@ -170,6 +172,7 @@ impl App
             current_focus: Focus::List,
             form_state: FormState::new(),
             should_quit: false,
+            config: Config::load(),
         }
     }
 
@@ -201,6 +204,7 @@ impl App
             current_focus: Focus::List,
             form_state: FormState::new(),
             should_quit: false,
+            config: Config::load(),
         }
     }
 
